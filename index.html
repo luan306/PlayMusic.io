@@ -57,6 +57,7 @@
     <script>
         var $ = document.querySelector.bind(document);
         var $$ = document.querySelectorAll.bind(document);
+        const PLAYER_STORAGE_KEY = 'LUANCODEDAO'
         const heading = $('header h2')
         const cdThumb = $('.cd-thumb')
         const audio = $('#audio')
@@ -67,11 +68,14 @@
         const nextBtn = $('.btn-next')
         const prevBtn = $('.btn-prev')
         const ramdomBtn = $('.btn-ramdom')
-
+        const repeartBtn = $('.btn-repeart')
+        const playlist = $('.playlist')
         const app = {
             currentIndex: 0,
             isPlaying: false,
             isRamdom: false,
+            isRepeat: false,
+            config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
             songs: [{
                 name: 'Anpanman-BTS',
                 Singer: 'BTS',
@@ -93,10 +97,14 @@
                 path: './music/HOME-BTS.mp3',
                 image: 'https://zhair.com.vn/anh-bts-cute/imager_1_6511_300.jpg'
             }, ],
+            setConfig: function(key, value) {
+                this.config[key] = value
+                localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config))
+            },
             render: function() {
-                var htmls = this.songs.map(song => {
+                var htmls = this.songs.map((song, index) => {
                     return `
-                        <div class="song">
+                        <div class="song ${index === this.currentIndex ? 'active': ''}" data-index="${index}">
                 <div class="thumb" style="background-image:url('${song.image}') ;"></div>
                 <div class="body">
                     <h3 class="title">
@@ -112,7 +120,7 @@
             </div>
                         `
                 })
-                playlist = $('.playlist').innerHTML = htmls.join(" ")
+                playlist.innerHTML = htmls.join(" ")
             },
             defineProperties: function() {
                 Object.defineProperty(this, 'currentSong', {
@@ -120,6 +128,7 @@
                         return this.songs[this.currentIndex]
                     }
                 })
+
             },
             handleEvents: function() {
                 const _this = this
@@ -177,6 +186,8 @@
                     }
 
                     audio.play()
+                    _this.render()
+                    _this.scrollToActiveSong()
                 }
                 prevBtn.onclick = function() {
                     if (_this.isRamdom) {
@@ -186,25 +197,69 @@
                     }
 
                     audio.play()
+                    _this.render()
+                    _this.scrollToActiveSong()
                 }
                 ramdomBtn.onclick = function(e) {
                     _this.isRamdom = !_this.isRamdom
+                    _this.setConfig('isRamdom', _this.isRamdom)
                     ramdomBtn.classList.toggle('active', _this.isRamdom)
-                    _this.playRamdomSong()
+
 
                 }
+                repeartBtn.onclick = function(e) {
+                    _this.isRepeat = !_this.isRepeat
+                    _this.setConfig('isRepeat', _this.isRepeat)
+                    repeartBtn.classList.toggle('active', _this.isRepeat)
+
+
+                }
+                audio.onended = function() {
+                    if (_this.isRepeat) {
+                        audio.play()
+                    } else {
+                        nextBtn.click()
+                    }
+                }
+                playlist.onclick = function(e) {
+                    const songNote = e.target.closest('.song:not(.active)')
+                    if (songNote || e.target.closest('.option')) {
+                        if (songNote) {
+                            _this.currentIndex = Number(songNote.dataset.index)
+                            _this.loadCurrentSong()
+                            _this.render()
+                            audio.play()
+                        }
+                        if (e.target.closest('.option')) {
+
+
+                        }
+                    }
+                }
+
+            },
+            scrollToActiveSong: function() {
+                setTimeout(() => {
+                    $('.song.active').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                    })
+                }, 300)
             },
             loadCurrentSong: function() {
-
                 heading.textContent = this.currentSong.name
                 cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`
                 audio.src = this.currentSong.path
+            },
+            loadConfig: function() {
+                this.isRamdom = this.config.isRamdom
+                this.isRepeat = this.config.isRepeat
 
             },
             nextSong: function() {
                 this.currentIndex++
-                    if (this.currentIndex >= this.songs.length - 1) {
-                        this.currentSong = 0
+                    if (this.currentIndex >= this.songs.length) {
+                        this.currentIndex = 0
                     }
                 this.loadCurrentSong()
             },
@@ -219,16 +274,19 @@
                 let newIndex
                 do {
                     newIndex = this.currentIndex = Math.floor(Math.random() * this.songs.length)
-                } while (newIndex !== this.currentIndex)
+                } while (newIndex === this.currentIndex)
                 this.currentIndex = newIndex
                 this.loadCurrentSong()
             },
 
             start: function() {
+                this.loadConfig();
                 this.handleEvents();
                 this.defineProperties();
                 this.render();
                 this.loadCurrentSong();
+                ramdomBtn.classList.toggle('active', this.isRamdom)
+                repeartBtn.classList.toggle('active', this.isRepeat)
             }
 
         }
