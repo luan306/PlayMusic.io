@@ -96,6 +96,31 @@
                 Singer: 'BTS',
                 path: './music/HOME-BTS.mp3',
                 image: 'https://zhair.com.vn/anh-bts-cute/imager_1_6511_300.jpg'
+            }, {
+                name: 'DNA-BTS',
+                Singer: 'BTS',
+                path: './music/DNA-BTS.mp3',
+                image: 'https://www.billboard.com/wp-content/uploads/2022/06/bts-door-concept-photo-courtesy-of-bighit-2022-billboard-1548.jpg?w=1024'
+            }, {
+                name: 'FAKE-LOVE-BTS',
+                Singer: 'BTS',
+                path: './music/FAKE-LOVE-BTS.mp3',
+                image: 'https://cdnmedia.thethaovanhoa.vn/Upload/PQgc44ci4D5b7WtAo06jg/files/2022/10/bts-top(9).jpg'
+            }, {
+                name: 'Permission-to-Dance-BTS',
+                Singer: 'BTS',
+                path: './music/Permission-to-Dance-BTS.mp3',
+                image: 'https://static01.nyt.com/images/2022/06/16/arts/14bts-1/14bts-1-mediumSquareAt3X.jpg'
+            }, {
+                name: 'Save-Me-BTS',
+                Singer: 'BTS',
+                path: './music/Save-Me-BTS.mp3',
+                image: 'https://cdnmedia.thethaovanhoa.vn/Upload/PQgc44ci4D5b7WtAo06jg/files/2022/10/bts-top(19).jpg'
+            }, {
+                name: 'The-Truth-Untold-BTS-Steve-Aoki',
+                Singer: 'BTS',
+                path: './music/The-Truth-Untold-BTS-Steve-Aoki.mp3',
+                image: 'https://image.thanhnien.vn/w1024/Uploaded/2022/zxaijr/2022_03_05/btslapkylucthegioimoi1-6082.jpg'
             }, ],
             setConfig: function(key, value) {
                 this.config[key] = value
@@ -174,7 +199,7 @@
                     }
                 }
                 progress.onchange = function(e) {
-                    // console.log(e.target.value / audio.duration * 100)
+
                     const seekTime = audio.duration / 100 * e.target.value
                     audio.currentTime = seekTime
                 }
@@ -204,7 +229,7 @@
                     _this.isRamdom = !_this.isRamdom
                     _this.setConfig('isRamdom', _this.isRamdom)
                     ramdomBtn.classList.toggle('active', _this.isRamdom)
-
+                    console.log(e.target.ramdomBtn)
 
                 }
                 repeartBtn.onclick = function(e) {
@@ -274,7 +299,7 @@
                 let newIndex
                 do {
                     newIndex = this.currentIndex = Math.floor(Math.random() * this.songs.length)
-                } while (newIndex === this.currentIndex)
+                } while (newIndex !== this.currentIndex)
                 this.currentIndex = newIndex
                 this.loadCurrentSong()
             },
